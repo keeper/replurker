@@ -3,6 +3,7 @@ import json
 import datetime
 from typing import Any, List
 
+from loguru import logger
 from plurk_oauth import PlurkAPI
 
 
@@ -19,7 +20,7 @@ def parse_args(args: List[str] = None) -> Any:
 
 if __name__ == "__main__":
     args = parse_args()
-    print(args)
+    logger.trace(args)
     key_file = args.auth_key
     allow_anonymous = args.allow_anonymous
     plurk = PlurkAPI.fromfile(key_file)
@@ -29,11 +30,11 @@ if __name__ == "__main__":
         "/APP/PlurkSearch/search",
         {"query": args.keyword},
     )
-    print(plurks)
+    logger.trace(plurks)
     replurk_ids = []
     manual_replurk_ids = []
     for p in plurks["plurks"]:
-        print(p)
+        logger.trace(p)
         if p["replurkable"] and not p["replurked"] and args.keyword in p["content_raw"]:
             if not allow_anonymous and p["anonymous"]:
                 continue
@@ -48,6 +49,6 @@ if __name__ == "__main__":
         log_fh.write(json.dumps(replurk_results, indent=2, ensure_ascii=False))
     replurk_ids = [r_id for r_id in replurk_results]
     failed_id = [r_id for r_id in replurk_ids if not replurk_results[r_id]["success"]]
-    print(failed_id)
-    print(manual_replurk_ids)
+    logger.trace(f"failed ids: {', '.join(map(str, failed_id))}")
+    logger.trace(f"manual replurk ids: {', '.join(map(str, manual_replurk_ids))}")
     # print(json.dumps(failed_replurk, indent=2, ensure_ascii=False))
