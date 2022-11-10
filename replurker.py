@@ -26,16 +26,10 @@ def is_replurkable(p: Dict, allow_anonymous: bool) -> bool:
     )
 
 
-if __name__ == "__main__":
-    args = parse_args()
-    logger.debug(args)
-    key_file = args.auth_key
-    allow_anonymous = args.allow_anonymous
-    plurk = PlurkAPI.fromfile(key_file)
-
+def get_plurk_ids(plurk: PlurkAPI, keyword: str) -> List[Dict]:
     plurks = plurk.callAPI(
         "/APP/PlurkSearch/search",
-        {"query": args.keyword},
+        {"query": keyword},
     )
     logger.info(f"Found {len(plurks['plurks'])} plurks")
     logger.trace(json.dumps(plurks, indent=2))
@@ -44,6 +38,18 @@ if __name__ == "__main__":
         logger.trace(json.dumps(p, indent=2))
         if is_replurkable(p, allow_anonymous):
             replurk_ids.append(p["plurk_id"])
+
+    return replurk_ids
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    logger.debug(args)
+    key_file = args.auth_key
+    allow_anonymous = args.allow_anonymous
+    plurk = PlurkAPI.fromfile(key_file)
+
+    replurk_ids = get_plurk_ids(plurk, args.keyword)
 
     replurk = plurk.callAPI("/APP/Timeline/replurk", {"ids": json.dumps(replurk_ids)})
 
