@@ -42,6 +42,12 @@ def get_plurk_ids(plurk: PlurkAPI, keyword: str) -> List[Dict]:
     return replurk_ids
 
 
+def replurk(plurk: PlurkAPI, ids: List[int]) -> List[Dict]:
+    replurk = plurk.callAPI("/APP/Timeline/replurk", {"ids": json.dumps(replurk_ids)})
+
+    return replurk["results"]
+
+
 if __name__ == "__main__":
     args = parse_args()
     logger.debug(args)
@@ -50,10 +56,8 @@ if __name__ == "__main__":
     plurk = PlurkAPI.fromfile(key_file)
 
     replurk_ids = get_plurk_ids(plurk, args.keyword)
+    replurk_results = replurk(plurk, replurk_ids)
 
-    replurk = plurk.callAPI("/APP/Timeline/replurk", {"ids": json.dumps(replurk_ids)})
-
-    replurk_results = replurk["results"]
     logger.trace(json.dumps(replurk_results, indent=2, ensure_ascii=False))
     logger.info(f"Replurk {len(replurk_results)}")
     replurked_ids = list(replurk_results.keys())
