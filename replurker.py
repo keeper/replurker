@@ -1,6 +1,5 @@
 import argparse
 import json
-import datetime
 from typing import Any, Dict, List
 
 from loguru import logger
@@ -34,7 +33,6 @@ if __name__ == "__main__":
     allow_anonymous = args.allow_anonymous
     plurk = PlurkAPI.fromfile(key_file)
 
-    today = datetime.datetime.today()
     plurks = plurk.callAPI(
         "/APP/PlurkSearch/search",
         {"query": args.keyword},
