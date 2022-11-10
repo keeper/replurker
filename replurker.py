@@ -1,7 +1,7 @@
 import argparse
 import json
 import datetime
-from typing import Any, List
+from typing import Any, Dict, List
 
 from loguru import logger
 from plurk_oauth import PlurkAPI
@@ -16,6 +16,15 @@ def parse_args(args: List[str] = None) -> Any:
     if args:
         return parser.parse_args(args)
     return parser.parse_args()
+
+
+def is_replurkable(p: Dict, allow_anonymous: bool) -> bool:
+    return (
+        p["replurkable"]
+        and not p["replurked"]
+        and args.keyword in p["content_raw"]
+        and (allow_anonymous or not p["anonymous"])
+    )
 
 
 if __name__ == "__main__":
@@ -36,9 +45,7 @@ if __name__ == "__main__":
     manual_replurk_ids = []
     for p in plurks["plurks"]:
         logger.trace(json.dumps(p, indent=2))
-        if p["replurkable"] and not p["replurked"] and args.keyword in p["content_raw"]:
-            if not allow_anonymous and p["anonymous"]:
-                continue
+        if is_replurkable(p, allow_anonymous):
             replurk_ids.append(p["plurk_id"])
         else:
             manual_replurk_ids.append(p["plurk_id"])

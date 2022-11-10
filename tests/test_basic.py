@@ -1,9 +1,27 @@
 import unittest
 
 from replurker import parse_args
+from replurker import is_replurkable
 
 
 class TestBasicFunctions(unittest.TestCase):
+    def setUp(self):
+        self.plurk = {
+            "content": "test #replurk_bot",
+            "content_raw": "test #replurk_bot",
+            "replurked": False,
+            "replurkable": True,
+            "anonymous": False,
+        }
+
+        self.anonymous_plurk = {
+            "content": "test #replurk_bot",
+            "content_raw": "test #replurk_bot",
+            "replurked": False,
+            "replurkable": True,
+            "anonymous": True,
+        }
+
     def test_parse_args(self):
         keyword = "#replurk_bot"
         key_file = "dummy.keys"
@@ -18,6 +36,23 @@ class TestBasicFunctions(unittest.TestCase):
         args2 = f"-k {keyword} --auth_key {key_file}".split()
         r2 = parse_args(args2)
         self.assertFalse(r2.allow_anonymous)
+
+    def test_is_replurkable(self):
+        p1 = dict(self.anonymous_plurk)
+        self.assertFalse(is_replurkable(p1, "#replurk_bot", False))
+        self.assertTrue(is_replurkable(p1, "#replurk_bot", True))
+
+        p2 = dict(self.anonymous_plurk)
+        p2["replurked"] = True
+        self.assertFalse(is_replurkable(p2, "#replurk_bot", True))
+
+        p3 = dict(self.anonymous_plurk)
+        p3["replurkable"] = False
+        self.assertFalse(is_replurkable(p3, "#replurk_bot", True))
+
+        p4 = dict(self.plurk)
+        self.assertTrue(is_replurkable(p4, "#replurk_bot", True))
+        self.assertTrue(is_replurkable(p4, "#replurk_bot", False))
 
 
 if __name__ == "__main__":
