@@ -60,4 +60,3 @@ if __name__ == "__main__":
     if failed_id:
         logger.warning(f"failed ids: {', '.join(map(str, failed_id))}")
     logger.trace(f"manual replurk ids: {', '.join(map(str, manual_replurk_ids))}")
-    # print(json.dumps(failed_replurk, indent=2, ensure_ascii=False))
