@@ -52,7 +52,7 @@ if __name__ == "__main__":
     replurk_results = replurk["results"]
     logger.trace(json.dumps(replurk_results, indent=2, ensure_ascii=False))
     logger.info(f"Replurk {len(replurk_results)}")
-    replurk_ids = [r_id for r_id in replurk_results]
+    replurk_ids = list(replurk_results.keys())
     failed_id = [r_id for r_id in replurk_ids if not replurk_results[r_id]["success"]]
     if failed_id:
         logger.warning(f"failed ids: {', '.join(map(str, failed_id))}")
