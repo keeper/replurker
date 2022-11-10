@@ -42,13 +42,10 @@ if __name__ == "__main__":
     logger.info(f"Found {len(plurks['plurks'])} plurks")
     logger.trace(json.dumps(plurks, indent=2))
     replurk_ids = []
-    manual_replurk_ids = []
     for p in plurks["plurks"]:
         logger.trace(json.dumps(p, indent=2))
         if is_replurkable(p, allow_anonymous):
             replurk_ids.append(p["plurk_id"])
-        else:
-            manual_replurk_ids.append(p["plurk_id"])
 
     replurk = plurk.callAPI("/APP/Timeline/replurk", {"ids": json.dumps(replurk_ids)})
 
@@ -59,4 +56,3 @@ if __name__ == "__main__":
     failed_id = [r_id for r_id in replurk_ids if not replurk_results[r_id]["success"]]
     if failed_id:
         logger.warning(f"failed ids: {', '.join(map(str, failed_id))}")
-    logger.trace(f"manual replurk ids: {', '.join(map(str, manual_replurk_ids))}")
