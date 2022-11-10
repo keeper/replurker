@@ -1,0 +1,19 @@
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "Phidias Chiang", email = "phidias.chiang@gmail.com"},
+]
+dependencies = [
+    "plurk-oauth @ git+https://github.com/clsung/plurk-oauth.git",
+]
+requires-python = ">=3.8"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["pdm-pep517>=1.0.0"]
+build-backend = "pdm.pep517.api"
+
+[tool]
+[tool.pdm]
