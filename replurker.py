@@ -1,30 +1,40 @@
+import argparse
 import json
 import datetime
-import sys
+from typing import Any, List
 
 from plurk_oauth import PlurkAPI
 
 
+def parse_args(args: List[str] = None) -> Any:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--auth_key")
+    parser.add_argument("-k", "--keyword")
+    parser.add_argument("-a", "--allow_anonymous", action="store_true", default=False)
+
+    if args:
+        return parser.parse_args(args)
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    KEYS = sys.argv[1]
-    allow_anonymous = True
-    if len(sys.argv) >= 2:
-        allow_anonymous = bool(sys.argv[3])
-    plurk = PlurkAPI.fromfile(KEYS)
+    args = parse_args()
+    print(args)
+    key_file = args.auth_key
+    allow_anonymous = args.allow_anonymous
+    plurk = PlurkAPI.fromfile(key_file)
 
     today = datetime.datetime.today()
     plurks = plurk.callAPI(
         "/APP/PlurkSearch/search",
-        {
-            "query": sys.argv[2],
-        },
+        {"query": args.keyword},
     )
     print(plurks)
     replurk_ids = []
     manual_replurk_ids = []
     for p in plurks["plurks"]:
         print(p)
-        if p["replurkable"] and not p["replurked"] and sys.argv[2] in p["content_raw"]:
+        if p["replurkable"] and not p["replurked"] and args.keyword in p["content_raw"]:
             if not allow_anonymous and p["anonymous"]:
                 continue
             replurk_ids.append(p["plurk_id"])
