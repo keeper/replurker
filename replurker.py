@@ -8,8 +8,8 @@ from plurk_oauth import PlurkAPI
 
 def parse_args(args: List[str] = None) -> Any:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--auth_key")
-    parser.add_argument("-k", "--keyword")
+    parser.add_argument("auth_key")
+    parser.add_argument("keyword")
     parser.add_argument("-a", "--allow_anonymous", action="store_true", default=False)
 
     if args:

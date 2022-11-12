@@ -26,16 +26,19 @@ class TestBasicFunctions(unittest.TestCase):
         keyword = "#replurk_bot"
         key_file = "dummy.keys"
 
-        args1 = f"-k {keyword} --auth_key {key_file} -a".split()
+        args1 = f"{key_file} {keyword} -a".split()
         r1 = parse_args(args1)
 
         self.assertEqual(r1.keyword, keyword)
         self.assertEqual(r1.auth_key, key_file)
         self.assertTrue(r1.allow_anonymous)
 
-        args2 = f"-k {keyword} --auth_key {key_file}".split()
+        args2 = f"{key_file} {keyword}".split()
         r2 = parse_args(args2)
         self.assertFalse(r2.allow_anonymous)
+
+        args3 = f"-a {key_file}".split()
+        self.assertRaises(SystemExit, parse_args, args3)
 
     def test_is_replurkable(self):
         p1 = dict(self.anonymous_plurk)
