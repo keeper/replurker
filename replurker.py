@@ -58,6 +58,7 @@ def main():
     logger.debug(args)
     key_file = args.auth_key
     allow_anonymous = args.allow_anonymous
+    keyword = f"#{args.keyword.translate({ord('#'): None})}"
     plurk = PlurkAPI.fromfile(key_file)
 
     if not plurk.is_authorized:
