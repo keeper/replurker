@@ -31,6 +31,9 @@ def get_plurk_ids(plurk: PlurkAPI, keyword: str, allow_anonymous: bool) -> List[
         "/APP/PlurkSearch/search",
         {"query": keyword},
     )
+    if plurks is None:
+        raise ConnectionError
+
     logger.info(f"Found {len(plurks['plurks'])} plurks")
     logger.trace(json.dumps(plurks, indent=2))
     replurk_ids = []
@@ -44,6 +47,8 @@ def get_plurk_ids(plurk: PlurkAPI, keyword: str, allow_anonymous: bool) -> List[
 
 def replurk(plurk: PlurkAPI, ids: List[int]) -> List[Dict]:
     replurk = plurk.callAPI("/APP/Timeline/replurk", {"ids": json.dumps(ids)})
+    if replurk is None:
+        raise ConnectionError
 
     return replurk["results"]
 
@@ -55,8 +60,19 @@ def main():
     allow_anonymous = args.allow_anonymous
     plurk = PlurkAPI.fromfile(key_file)
 
-    replurk_ids = get_plurk_ids(plurk, args.keyword, allow_anonymous)
-    replurk_results = replurk(plurk, replurk_ids)
+    if not plurk.is_authorized:
+        logger.error(f"Authorization failed, please check you key file: {key_file}")
+        raise SystemExit
+
+    try:
+        replurk_ids = get_plurk_ids(plurk, keyword, allow_anonymous)
+        replurk_results = replurk(plurk, replurk_ids)
+    except ConnectionError:
+        logger.error(
+            f"Can not get any plurk ids which may due to authorization failed, "
+            f"please check you key file: {key_file}"
+        )
+        raise SystemExit
 
     logger.trace(json.dumps(replurk_results, indent=2, ensure_ascii=False))
     logger.info(f"Replurk {len(replurk_results)}")
