@@ -1,12 +1,15 @@
 import unittest
+from unittest.mock import MagicMock
 
 from replurker import parse_args
 from replurker import is_replurkable
+from replurker import get_plurk_ids
 
 
 class TestBasicFunctions(unittest.TestCase):
     def setUp(self):
         self.plurk = {
+            "plurk_id": 42,
             "content": "test #replurk_bot",
             "content_raw": "test #replurk_bot",
             "replurked": False,
@@ -15,12 +18,16 @@ class TestBasicFunctions(unittest.TestCase):
         }
 
         self.anonymous_plurk = {
+            "plurk_id": 43,
             "content": "test #replurk_bot",
             "content_raw": "test #replurk_bot",
             "replurked": False,
             "replurkable": True,
             "anonymous": True,
         }
+
+        self.plurk_cli = MagicMock()
+        self.plurk_cli.callAPI
 
     def test_parse_args(self):
         keyword = "#replurk_bot"
@@ -56,6 +63,16 @@ class TestBasicFunctions(unittest.TestCase):
         p4 = dict(self.plurk)
         self.assertTrue(is_replurkable(p4, "#replurk_bot", True))
         self.assertTrue(is_replurkable(p4, "#replurk_bot", False))
+
+    def test_get_plurk_ids(self):
+        plurks = {"plurks": [dict(self.plurk), dict(self.anonymous_plurk)]}
+        self.plurk_cli.callAPI = MagicMock(return_value=plurks)
+
+        ids1 = get_plurk_ids(self.plurk_cli, "#replurk_bot", True)
+        self.assertEqual(ids1, [42, 43])
+
+        ids2 = get_plurk_ids(self.plurk_cli, "#replurk_bot", False)
+        self.assertEqual(ids2, [42])
 
 
 if __name__ == "__main__":
